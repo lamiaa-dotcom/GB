@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Ceci est requis pour actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +40,6 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write # Ceci est requis pour demander le JWT
-      contents: read # Ceci est requis pour actions/checkout
 
     steps:
       - name: Download artifact from build job
@@ -57,14 +53,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'gb-lamiaa'  # Ton App Service Azure
+          app-name: 'gb-lamiaa' # Attention : mets ici ton vrai nom d'application si différent
           slot-name: 'Production'
           package: .
